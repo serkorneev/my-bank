@@ -4,6 +4,7 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:security="http://www.springframework.org/schema/security"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
@@ -11,11 +12,37 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/data/jpa
-        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd">
 
     <context:component-scan base-package="com.griddynamics.mybank"/>
     <mvc:annotation-driven />
     <jpa:repositories base-package="com.griddynamics.mybank.repository"/>
+
+    <bean id="httpStatusEntryPoint" class="org.springframework.security.web.authentication.HttpStatusEntryPoint">
+        <constructor-arg name="httpStatus" value="UNAUTHORIZED"/>
+    </bean>
+    <security:http
+            realm="Protected API"
+            use-expressions="true"
+            auto-config="false"
+            create-session="stateless"
+            entry-point-ref="httpStatusEntryPoint"
+            authentication-manager-ref="authenticationManager">
+        <security:custom-filter ref="authenticationTokenProcessingFilter" position="FORM_LOGIN_FILTER" />
+        <security:intercept-url pattern="/rest/auth" access="permitAll" />
+        <security:intercept-url pattern="/rest/**" access="hasRole('ROLE_ADMIN')" />
+        <security:csrf disabled="true" />
+    </security:http>
+
+    <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider>
+            <security:user-service id="userService">
+                <security:user name="jimi" password="jimispassword" authorities="ROLE_USER, ROLE_ADMIN" />
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="org.postgresql.Driver" />
