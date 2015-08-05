@@ -13,6 +13,7 @@
 
         <spring.version>4.1.7.RELEASE</spring.version>
         <hibernate.version>4.3.10.Final</hibernate.version>
+        <gigaspaces.version>10.1.0-12620-RELEASE</gigaspaces.version>
     </properties>
 
     <dependencies>
@@ -88,9 +89,27 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
         </dependency>
+
+        <dependency>
+            <artifactId>gs-runtime</artifactId>
+            <groupId>com.gigaspaces</groupId>
+            <version>${gigaspaces.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>gs-openspaces</artifactId>
+            <groupId>com.gigaspaces</groupId>
+            <version>${gigaspaces.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
         <finalName>my-bank</finalName>
     </build>
+
+    <repositories>
+        <repository>
+            <id>org.openspaces</id>
+            <url>http://maven-repository.openspaces.org</url>
+        </repository>
+    </repositories>
 </project>

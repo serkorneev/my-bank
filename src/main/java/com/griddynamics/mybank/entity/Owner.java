@@ -1,18 +1,22 @@
 package com.griddynamics.mybank.entity;
 
+import com.gigaspaces.annotation.pojo.SpaceClass;
+import com.gigaspaces.annotation.pojo.SpaceId;
+
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * @author Sergey Korneev
  */
 @Entity
-@Table(name = "owner")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Owner {
+@SpaceClass
+public class Owner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -21,8 +25,13 @@ public class Owner {
 
     private String lastName;
 
+    @SpaceId(autoGenerate=false)
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFirstName() {
