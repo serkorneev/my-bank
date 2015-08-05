@@ -25,7 +25,7 @@ public class Owner implements Serializable {
 
     private String lastName;
 
-    @SpaceId(autoGenerate=false)
+    @SpaceId
     public int getId() {
         return id;
     }

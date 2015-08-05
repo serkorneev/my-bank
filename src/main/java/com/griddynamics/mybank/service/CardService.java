@@ -2,10 +2,13 @@ package com.griddynamics.mybank.service;
 
 import com.griddynamics.mybank.entity.Card;
 import com.griddynamics.mybank.entity.Owner;
+import com.griddynamics.mybank.entity.Transaction;
 import com.griddynamics.mybank.exception.CardIsLockedException;
 import com.griddynamics.mybank.repository.CardRepository;
 import com.griddynamics.mybank.repository.OwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -58,8 +61,17 @@ public class CardService {
             throw new CardIsLockedException();
         }
         card.setBalance(card.getBalance() + summ);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        Transaction transaction = new Transaction();
+        transaction.setCard(card);
+        transaction.setSumm(summ);
+        transaction.setAdminName(auth.getName());
+        card.addTransaction(transaction);
         cardRepository.save(card);
-        return card;
+
+        return getCard(id);
     }
 
     public Card getCard(int id) {
