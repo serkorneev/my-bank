@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:os-core="http://www.openspaces.org/schema/core"
+       xmlns:os-events="http://www.openspaces.org/schema/events"
+       xmlns:os-remoting="http://www.openspaces.org/schema/remoting"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:os-sla="http://www.openspaces.org/schema/sla"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.openspaces.org/schema/core http://www.openspaces.org/schema/core/openspaces-core.xsd
+       http://www.openspaces.org/schema/events http://www.openspaces.org/schema/events/openspaces-events.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.openspaces.org/schema/remoting http://www.openspaces.org/schema/remoting/openspaces-remoting.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.openspaces.org/schema/sla http://www.openspaces.org/schema/9.5/sla/openspaces-sla.xsd">
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver" />
+        <property name="url" value="jdbc:postgresql://localhost:5432/bank" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>com.griddynamics.mybank.entity.Card</value>
+                <value>com.griddynamics.mybank.entity.Owner</value>
+                <value>com.griddynamics.mybank.entity.Transaction</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</prop>
+                <prop key="hibernate.cache.use_second_level_cache">false</prop>
+                <prop key="hibernate.cache.use_query_cache">false</prop>
+                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+                <prop key="hibernate.jdbc.batch_size">50</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="hibernateSpaceDataSource" class="org.openspaces.persistency.hibernate.DefaultHibernateSpaceDataSourceFactoryBean">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="initialLoadChunkSize" value="2000"/>
+    </bean>
+
+    <bean id="hibernateSpaceSynchronizationEndpoint" class="org.openspaces.persistency.hibernate.DefaultHibernateSpaceSynchronizationEndpointFactoryBean">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <os-core:embedded-space id="space" name="space" schema="persistent" space-data-source="hibernateSpaceDataSource"
+                            space-sync-endpoint="hibernateSpaceSynchronizationEndpoint" >
+        <os-core:properties>
+            <props>
+                <prop key="cluster-config.cache-loader.external-data-source">true</prop>
+                <prop key="cluster-config.cache-loader.central-data-source">true</prop>
+            </props>
+        </os-core:properties>
+    </os-core:embedded-space>
+    <os-core:distributed-tx-manager id="transactionManager" />
+    <os-core:giga-space id="gigaSpace" space="space" tx-manager="transactionManager" />
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>

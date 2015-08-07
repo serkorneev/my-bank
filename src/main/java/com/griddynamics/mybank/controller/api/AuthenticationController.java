@@ -3,6 +3,7 @@ package com.griddynamics.mybank.controller.api;
 import com.griddynamics.mybank.controller.api.dto.LoginDto;
 import com.griddynamics.mybank.controller.api.dto.TokenDto;
 import com.griddynamics.mybank.security.rest.TokenUtils;
+import com.griddynamics.mybank.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +26,9 @@ public class AuthenticationController {
     private UserDetailsService userService;
 
     @Autowired
+    private CardService service;
+
+    @Autowired
     @Qualifier("authenticationManager")
     private AuthenticationManager authManager;
 
@@ -37,6 +41,7 @@ public class AuthenticationController {
         UserDetails userDetails = this.userService.loadUserByUsername(loginDto.username);
         TokenDto dto = new TokenDto();
         dto.token = TokenUtils.createToken(userDetails);
+        service.init();
 
         return dto;
     }

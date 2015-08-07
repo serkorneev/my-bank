@@ -6,6 +6,7 @@ import com.griddynamics.mybank.entity.Transaction;
 import com.griddynamics.mybank.exception.CardIsLockedException;
 import com.griddynamics.mybank.repository.CardRepository;
 import com.griddynamics.mybank.repository.OwnerRepository;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -22,6 +22,9 @@ import java.util.List;
 @Service
 public class CardService {
     @Autowired
+    private SessionFactory sessionFactory;
+
+    @Autowired
     private CardRepository cardRepository;
 
     @Autowired
@@ -29,6 +32,9 @@ public class CardService {
 
     @PostConstruct
     public void init() {
+//        Session session = this.sessionFactory.openSession();
+//        org.hibernate.Transaction tx = session.beginTransaction();
+
         Card card = new Card();
         Owner owner = new Owner();
         owner.setFirstName("John");
@@ -36,9 +42,11 @@ public class CardService {
         ownerRepository.save(owner);
         card.setOwner(owner);
         cardRepository.save(card);
+
+//        tx.commit();
+//        session.close();
     }
 
-    @Transactional
     public Card lock(int id) {
         Card card = getCard(id);
         card.lock();
@@ -46,7 +54,6 @@ public class CardService {
         return card;
     }
 
-    @Transactional
     public Card unlock(int id) {
         Card card = getCard(id);
         card.unLock();
@@ -54,7 +61,6 @@ public class CardService {
         return card;
     }
 
-    @Transactional
     public Card increaseBalance(int id, double summ) {
         Card card = getCard(id);
         if (card.isLocked()) {
