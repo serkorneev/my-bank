@@ -1,12 +1,11 @@
 package com.griddynamics.mybank.entity;
 
-import com.gigaspaces.annotation.pojo.SpaceClass;
-import com.gigaspaces.annotation.pojo.SpaceId;
-import com.gigaspaces.metadata.StorageType;
+import com.gigaspaces.annotation.pojo.SpaceExclude;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -15,36 +14,19 @@ import java.util.Set;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-@SpaceClass(storageType = StorageType.BINARY)
-public class Card {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @XmlElement
-    private int id;
-
+public class Card extends BaseEntity {
     @XmlElement
     private double balance;
 
     @XmlElement
     private boolean locked = false;
 
-    @ManyToOne
     @XmlElement(type = Owner.class)
     private Owner owner;
 
-    @OneToMany(orphanRemoval = true, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @XmlElementWrapper(name="transactions")
     @XmlElement(name="transaction")
     private Set<Transaction> transactions;
-
-    @SpaceId
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public double getBalance() {
         return balance;
@@ -66,6 +48,11 @@ public class Card {
         this.locked = false;
     }
 
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    @ManyToOne(cascade = {CascadeType.ALL})
     public Owner getOwner() {
         return owner;
     }
@@ -74,12 +61,26 @@ public class Card {
         this.owner = owner;
     }
 
+    protected void setTransactionsInternal(Set<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    @OneToMany(orphanRemoval = true, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    protected Set<Transaction> getTransactionsInternal() {
+        if (this.transactions == null) {
+            this.transactions = new HashSet<>();
+        }
+        return this.transactions;
+    }
+
+    @SpaceExclude
+    @Transient
     public Set<Transaction> getTransactions() {
-        return Collections.unmodifiableSet(transactions);
+        return Collections.unmodifiableSet(getTransactionsInternal());
     }
 
     public void addTransaction(Transaction transaction) {
         transaction.setCard(this);
-        this.transactions.add(transaction);
+        this.getTransactionsInternal().add(transaction);
     }
 }

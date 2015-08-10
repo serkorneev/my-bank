@@ -3,22 +3,24 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:os-core="http://www.openspaces.org/schema/core"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc.xsd
-        http://www.springframework.org/schema/data/jpa
-        http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
         http://www.springframework.org/schema/security
-        http://www.springframework.org/schema/security/spring-security.xsd">
+        http://www.springframework.org/schema/security/spring-security.xsd
+        http://www.openspaces.org/schema/core
+        http://www.openspaces.org/schema/9.5/core/openspaces-core.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <context:component-scan base-package="com.griddynamics.mybank"/>
     <mvc:annotation-driven />
-    <jpa:repositories base-package="com.griddynamics.mybank.repository"/>
 
     <bean id="httpStatusEntryPoint" class="org.springframework.security.web.authentication.HttpStatusEntryPoint">
         <constructor-arg name="httpStatus" value="UNAUTHORIZED"/>
@@ -44,43 +46,9 @@
         </security:authentication-provider>
     </security:authentication-manager>
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="org.postgresql.Driver" />
-        <property name="url" value="jdbc:postgresql://localhost:5432/bank" />
-        <property name="username" value="root" />
-        <property name="password" value="root" />
-    </bean>
-
-    <bean id="sessionFactory" class="org.springframework.orm.jpa.vendor.HibernateJpaSessionFactoryBean">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
-    <bean id="hibernateSpaceDataSource" class="org.openspaces.persistency.hibernate.DefaultHibernateSpaceDataSourceFactoryBean">
-        <property name="sessionFactory" ref="sessionFactory"/>
-        <property name="initialLoadChunkSize" value="2000"/>
-    </bean>
-
-    <bean id="space" class="org.openspaces.core.space.EmbeddedSpaceFactoryBean">
-        <property name="lookupGroups" value="gigaspaces-10.1.1-XAPPremium-ga"/>
-        <property name="lookupTimeout" value="20000"/>
-        <property name="spaceDataSource" ref="hibernateSpaceDataSource" />
-    </bean>
-
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="packagesToScan" value="com.griddynamics.mybank.entity" />
-        <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
-        </property>
-        <property name="jpaProperties">
-            <props>
-                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</prop>
-                <prop key="hibernate.show_sql">true</prop>
-                <prop key="hibernate.format_sql">true</prop>
-            </props>
-        </property>
-    </bean>
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
+    <bean id="propertiesConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    <os-core:space id="space" url="jini://*/*/space" lookup-timeout="20000"/>
+    <os-core:local-tx-manager id="jiniTransactionManager" space="space"/>
+    <tx:annotation-driven transaction-manager="jiniTransactionManager"/>
+    <os-core:giga-space id="gigaSpace" space="space"/>
 </beans>

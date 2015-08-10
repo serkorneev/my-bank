@@ -1,16 +1,13 @@
 package com.griddynamics.mybank.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.gigaspaces.annotation.pojo.SpaceClass;
-import com.gigaspaces.annotation.pojo.SpaceId;
-import com.gigaspaces.metadata.StorageType;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -19,14 +16,8 @@ import java.util.Date;
 @Entity
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
-@SpaceClass(storageType = StorageType.BINARY)
-public class Transaction implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @XmlElement
-    private int id;
+public class Transaction extends BaseEntity {
 
-    @ManyToOne
     @JsonIgnore
     private Card card;
 
@@ -39,15 +30,7 @@ public class Transaction implements Serializable {
     @XmlElement
     private Date creationDate = new Date();
 
-    @SpaceId
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
+    @ManyToOne
     public Card getCard() {
         return card;
     }
@@ -75,4 +58,6 @@ public class Transaction implements Serializable {
     public Date getCreationDate() {
         return creationDate;
     }
+
+    public void setCreationDate(Date date) {}
 }

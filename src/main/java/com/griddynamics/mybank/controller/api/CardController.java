@@ -6,8 +6,6 @@ import com.griddynamics.mybank.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * @author Sergey Korneev
  */
@@ -18,7 +16,7 @@ public class CardController {
     private CardService cardService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public List index() {
+    public Card[] index() {
         return cardService.getCards();
     }
 

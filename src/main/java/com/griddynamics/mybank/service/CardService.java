@@ -1,20 +1,17 @@
 package com.griddynamics.mybank.service;
 
 import com.griddynamics.mybank.entity.Card;
-import com.griddynamics.mybank.entity.Owner;
 import com.griddynamics.mybank.entity.Transaction;
 import com.griddynamics.mybank.exception.CardIsLockedException;
 import com.griddynamics.mybank.repository.CardRepository;
-import com.griddynamics.mybank.repository.OwnerRepository;
+import com.griddynamics.mybank.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-import java.util.List;
 
 /**
  * @author Sergey Korneev
@@ -25,18 +22,7 @@ public class CardService {
     private CardRepository cardRepository;
 
     @Autowired
-    private OwnerRepository ownerRepository;
-
-    @PostConstruct
-    public void init() {
-        Card card = new Card();
-        Owner owner = new Owner();
-        owner.setFirstName("John");
-        owner.setLastName("Doe");
-        ownerRepository.save(owner);
-        card.setOwner(owner);
-        cardRepository.save(card);
-    }
+    private TransactionRepository transactionRepository;
 
     @Transactional
     public Card lock(int id) {
@@ -69,6 +55,7 @@ public class CardService {
         transaction.setSumm(summ);
         transaction.setAdminName(auth.getName());
         card.addTransaction(transaction);
+        transactionRepository.save(transaction);
         cardRepository.save(card);
 
         return getCard(id);
@@ -82,7 +69,7 @@ public class CardService {
         return card;
     }
 
-    public List<Card> getCards() {
-        return (List<Card>) cardRepository.findAll();
+    public Card[] getCards() {
+        return cardRepository.findAll();
     }
 }

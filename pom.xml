@@ -11,7 +11,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <spring.version>4.1.7.RELEASE</spring.version>
+        <spring.version>4.1.1.RELEASE</spring.version>
         <hibernate.version>4.3.10.Final</hibernate.version>
         <gigaspaces.version>10.1.0-12620-RELEASE</gigaspaces.version>
     </properties>
@@ -23,9 +23,9 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-jpa</artifactId>
-            <version>1.8.0.RELEASE</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -91,11 +91,6 @@
         </dependency>
 
         <dependency>
-            <artifactId>gs-runtime</artifactId>
-            <groupId>com.gigaspaces</groupId>
-            <version>${gigaspaces.version}</version>
-        </dependency>
-        <dependency>
             <artifactId>gs-openspaces</artifactId>
             <groupId>com.gigaspaces</groupId>
             <version>${gigaspaces.version}</version>
@@ -103,7 +98,36 @@
     </dependencies>
 
     <build>
-        <finalName>my-bank</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <verbose>true</verbose>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>install</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <repositories>
