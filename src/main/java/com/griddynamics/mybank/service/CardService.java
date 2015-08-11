@@ -35,7 +35,7 @@ public class CardService {
     @Transactional
     public Card unlock(int id) {
         Card card = getCard(id);
-        card.unLock();
+        card.unlock();
         cardRepository.save(card);
         return card;
     }

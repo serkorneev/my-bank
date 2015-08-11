@@ -3,6 +3,7 @@ package com.griddynamics.mybank.entity;
 import com.gigaspaces.annotation.pojo.SpaceExclude;
 
 import javax.persistence.*;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.*;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,28 +29,58 @@ public class Card extends BaseEntity {
     @XmlElement(name="transaction")
     private Set<Transaction> transactions;
 
+    private String encodedData = createEncodedData();
+
+    private String getEncodedData() {
+        return encodedData;
+    }
+
+    private void setEncodedData(String data) {
+        if (null == data || data.isEmpty()) {
+            data = createEncodedData();
+        }
+        String decodedData = new String(DatatypeConverter.parseBase64Binary(data));
+        if (decodedData.matches(".*\\:.*")) {
+            String[] decodedInformation = decodedData.split(":");
+            this.balance = Double.parseDouble(decodedInformation[0]);
+            this.locked = Boolean.parseBoolean(decodedInformation[1]);
+            this.encodedData = createEncodedData();
+        }
+    }
+
+    @SpaceExclude
+    @Transient
     public double getBalance() {
         return balance;
     }
 
     public void setBalance(double balance) {
         this.balance = balance;
+        this.encodedData = createEncodedData();
     }
 
+    @SpaceExclude
+    @Transient
     public boolean isLocked() {
         return locked;
     }
 
     public void lock() {
-        this.locked = true;
+        setLocked(true);
     }
 
-    public void unLock() {
-        this.locked = false;
+    public void unlock() {
+        setLocked(false);
     }
 
-    public void setLocked(boolean locked) {
+    private void setLocked(boolean locked) {
         this.locked = locked;
+        this.encodedData = createEncodedData();
+    }
+
+    private String createEncodedData() {
+        String data = balance + ":" + locked;
+        return DatatypeConverter.printBase64Binary(data.getBytes());
     }
 
     @ManyToOne(cascade = {CascadeType.ALL})
