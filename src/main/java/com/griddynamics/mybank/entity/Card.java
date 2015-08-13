@@ -96,7 +96,7 @@ public class Card extends BaseEntity {
         this.transactions = transactions;
     }
 
-    @OneToMany(orphanRemoval = true, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "card")
     protected Set<Transaction> getTransactionsInternal() {
         if (this.transactions == null) {
             this.transactions = new HashSet<>();

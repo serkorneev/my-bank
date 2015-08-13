@@ -25,7 +25,7 @@ public class CardService {
     private TransactionRepository transactionRepository;
 
     @Transactional
-    public Card lock(int id) {
+    public Card lock(String id) {
         Card card = getCard(id);
         card.lock();
         cardRepository.save(card);
@@ -33,7 +33,7 @@ public class CardService {
     }
 
     @Transactional
-    public Card unlock(int id) {
+    public Card unlock(String id) {
         Card card = getCard(id);
         card.unlock();
         cardRepository.save(card);
@@ -41,7 +41,7 @@ public class CardService {
     }
 
     @Transactional
-    public Card increaseBalance(int id, double summ) {
+    public Card increaseBalance(String id, double summ) {
         Card card = getCard(id);
         if (card.isLocked()) {
             throw new CardIsLockedException();
@@ -61,7 +61,7 @@ public class CardService {
         return getCard(id);
     }
 
-    public Card getCard(int id) {
+    public Card getCard(String id) {
         Card card = cardRepository.findOne(id);
         if (card == null) {
             throw new EntityNotFoundException();

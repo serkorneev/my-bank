@@ -37,6 +37,7 @@ public class Transaction extends BaseEntity {
 
     public void setCard(Card card) {
         this.card = card;
+        this.setRoutingProperty(card.getRoutingProperty());
     }
 
     public double getSumm() {

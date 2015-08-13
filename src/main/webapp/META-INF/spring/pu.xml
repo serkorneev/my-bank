@@ -13,6 +13,7 @@
     <os-sla:sla cluster-schema="partitioned-sync2backup" number-of-instances="2" number-of-backups="1"
                 max-instances-per-vm="1">
     </os-sla:sla>
+
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="org.postgresql.Driver" />
         <property name="url" value="jdbc:postgresql://localhost:5432/bank" />
@@ -36,13 +37,13 @@
                 <prop key="hibernate.cache.use_query_cache">false</prop>
                 <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
                 <prop key="hibernate.jdbc.batch_size">50</prop>
+                <prop key="hibernate.hbm2ddl.import_files">/sql/fixtures.sql</prop>
             </props>
         </property>
     </bean>
 
     <bean id="hibernateSpaceDataSource" class="org.openspaces.persistency.hibernate.DefaultHibernateSpaceDataSourceFactoryBean">
         <property name="sessionFactory" ref="sessionFactory"/>
-        <property name="initialLoadChunkSize" value="2000"/>
     </bean>
 
     <bean id="hibernateSpaceSynchronizationEndpoint" class="org.openspaces.persistency.hibernate.DefaultHibernateSpaceSynchronizationEndpointFactoryBean">
@@ -53,6 +54,7 @@
             id="space"
             url="/./space"
             schema="persistent"
+            mirror="true"
             space-data-source="hibernateSpaceDataSource"
             space-sync-endpoint="hibernateSpaceSynchronizationEndpoint"
             lookup-timeout="20000">

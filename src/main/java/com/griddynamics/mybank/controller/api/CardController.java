@@ -21,22 +21,22 @@ public class CardController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Card get(@PathVariable int id) {
+    public Card get(@PathVariable String id) {
         return cardService.getCard(id);
     }
 
     @RequestMapping(value = "/{id}/lock", method = RequestMethod.POST)
-    public Card lock(@PathVariable int id) {
+    public Card lock(@PathVariable String id) {
         return cardService.lock(id);
     }
 
     @RequestMapping(value = "/{id}/unlock", method = RequestMethod.POST)
-    public Card unlock(@PathVariable int id) {
+    public Card unlock(@PathVariable String id) {
         return cardService.unlock(id);
     }
 
     @RequestMapping(value = "/{id}/increase", method = RequestMethod.POST)
-    public Card increaseBalance(@PathVariable int id, @RequestBody IncreaseBalanceDto dto) {
+    public Card increaseBalance(@PathVariable String id, @RequestBody IncreaseBalanceDto dto) {
         return cardService.increaseBalance(id, dto.summ);
     }
 }

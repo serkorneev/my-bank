@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CardRepositoryImpl extends BaseRepositoryImpl implements CardRepository {
     @Override
     @Transactional
-    public Card findOne(int id) {
+    public Card findOne(String id) {
         return gs.readById(Card.class, id);
     }
 

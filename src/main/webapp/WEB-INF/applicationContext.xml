@@ -48,7 +48,7 @@
 
     <bean id="propertiesConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <os-core:space id="space" url="jini://*/*/space" lookup-timeout="20000"/>
-    <os-core:local-tx-manager id="jiniTransactionManager" space="space"/>
-    <tx:annotation-driven transaction-manager="jiniTransactionManager"/>
+    <os-core:distributed-tx-manager id="transactionManager"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
     <os-core:giga-space id="gigaSpace" space="space"/>
 </beans>

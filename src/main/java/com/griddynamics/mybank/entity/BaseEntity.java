@@ -5,9 +5,7 @@ import com.gigaspaces.annotation.pojo.SpaceExclude;
 import com.gigaspaces.annotation.pojo.SpaceId;
 import com.gigaspaces.annotation.pojo.SpaceRouting;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import java.io.Serializable;
 
@@ -17,17 +15,18 @@ import java.io.Serializable;
 @MappedSuperclass
 public abstract class BaseEntity implements Serializable {
 
-    private Integer id;
+    private String id;
 
-    public void setId(Integer id) {
+    private Integer routingProperty;
+
+    public void setId(String id) {
         this.id = id;
     }
 
     @Id
-    @SpaceId(autoGenerate = false)
-    @SpaceRouting
+    @SpaceId(autoGenerate = true)
     @XmlElement
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
@@ -48,5 +47,15 @@ public abstract class BaseEntity implements Serializable {
 
     public int hashCode() {
         return (id != null ? id.hashCode() : 0);
+    }
+
+    @SpaceRouting
+    @JsonIgnore
+    public Integer getRoutingProperty() {
+        return routingProperty;
+    }
+
+    public void setRoutingProperty(Integer routingProperty) {
+        this.routingProperty = routingProperty;
     }
 }
