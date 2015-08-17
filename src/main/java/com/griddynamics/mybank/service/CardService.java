@@ -58,7 +58,7 @@ public class CardService {
         transactionRepository.save(transaction);
         cardRepository.save(card);
 
-        return getCard(id);
+        return card;
     }
 
     public Card getCard(String id) {

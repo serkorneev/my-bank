@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <context:component-scan base-package="com.griddynamics.mybank.controller.api"/>
+    <mvc:annotation-driven />
+
+    <bean class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="com.griddynamics.mybank.service.CardService"/>
+    </bean>
+    <bean class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="com.griddynamics.mybank.repository.CardRepository"/>
+    </bean>
+    <bean class="org.mockito.Mockito" factory-method="mock">
+        <constructor-arg value="com.griddynamics.mybank.repository.TransactionRepository"/>
+    </bean>
+
+    <bean id="httpStatusEntryPoint" class="org.springframework.security.web.authentication.HttpStatusEntryPoint">
+        <constructor-arg name="httpStatus" value="UNAUTHORIZED"/>
+    </bean>
+    <security:http
+            realm="Protected API"
+            use-expressions="true"
+            auto-config="false"
+            create-session="stateless"
+            entry-point-ref="httpStatusEntryPoint"
+            authentication-manager-ref="authenticationManager">
+        <security:intercept-url pattern="/rest/**" access="permitAll" />
+        <security:csrf disabled="true" />
+    </security:http>
+
+    <security:authentication-manager id="authenticationManager">
+        <security:authentication-provider>
+            <security:user-service id="userService">
+                <security:user name="jimi" password="jimispassword" authorities="ROLE_USER, ROLE_ADMIN" />
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+</beans>

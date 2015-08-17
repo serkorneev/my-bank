@@ -10,7 +10,7 @@ import javax.persistence.MappedSuperclass;
  * @author Sergey Korneev
  */
 @MappedSuperclass
-public class BaseRepositoryImpl implements BaseRepository {
+public abstract class BaseRepositoryImpl implements BaseRepository {
 
     @Autowired
     GigaSpace gs;
